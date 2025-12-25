@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>نظام إدارة الصيدلية</title>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2><i class="fas fa-clinic-medical"></i> صيدليتي</h2>
+                <button class="close-sidebar-btn" id="closeSidebarBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <ul class="menu">
+                <li class="active" data-section="dashboard"><i class="fas fa-chart-pie"></i> لوحة التحكم</li>
+                <li data-section="medications"><i class="fas fa-pills"></i> إدارة الأدوية</li>
+                <li data-section="sales-products"><i class="fas fa-cash-register"></i>عرض الادوية</li>
+                <li data-section="inventory"><i class="fas fa-warehouse"></i> إدارة المخزون</li>
+                <li data-section="sales"><i class="fas fa-shopping-cart"></i> المبيعات</li>
+            </ul>
+        </div>
+
+        <div class="main-content">
+            <div class="header">
+                <div class="user-info">
+                    <span>مرحباً، دكتور</span>
+                    <div class="user-avatar">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                </div>
+
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <div class="sidebar-overlay" id="sidebarOverlay"></div> <!-- Sidebar Overlay -->
+
+            <div class="content-section active" id="dashboard-section">
+                <h2>لوحة تحكم الصيدلية</h2>
+                <div class="stats-cards">
+                    <div class="stat-card" onclick="showMedicineDetails()" style="cursor: pointer;">
+                        <div class="stat-icon" style="background-color: #4e73df;">
+                            <i class="fas fa-pills"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-medications">0</h3>
+                            <p>إجمالي الأدوية</p>
+                        </div>
+                    </div>
+                    <div class="stat-card" id="missing-items-card">
+                        <div class="stat-icon" style="background-color: #1cc88a;">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="missing-items-count">0</h3>
+                            <p>الأدوية الناقصة</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #36b9cc;">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="expired-count">0</h3>
+                            <p>أدوية منتهية</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background-color: #f6c23e;">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="total-sales">0</h3>
+                            <p>إجمالي المبيعات</p>
+                        </div>
+                        <button class="clear-button" onclick="clearSalesRecords()">مسح السجلات</button>
+                    </div>
+                </div>
+
+                <div class="charts-container">
+                    <div class="chart">
+                        <h3>المبيعات حسب القسم</h3>
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                    <div class="chart">
+                        <h3>أكثر الأدوية مبيعاً</h3>
+                        <div class="top-products-chart">
+                            <canvas id="topProductsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="medications-section">
+                <h2>إدارة الأدوية</h2>
+                <div class="cruds">
+                    <div class="header">
+                        <h2>إدارة الأدوية</h2>
+                        <p>إضافة وتعديل وحذف الأدوية</p>
+                    </div>
+
+                    <div class="inputs">
+                        <input id="medName" type="text" placeholder="اسم الدواء">
+                        <div id="drug-suggestions" class="suggestions-box"></div>
+                        <input id="company" type="text" placeholder="الشركة المصنعة">
+
+                        <div class="input">
+                            <label for="imageFile">صورة المنتج (رفع ملف)</label>
+                            <input type="file" id="imageFile" accept="image/*">
+                            <input type="hidden" id="imageURL"> 
+                        </div>
+                        
+                        <div class="price">
+                            <input onkeyup="getTotal();" type="number" id="price" placeholder="السعر">
+                            <input onkeyup="getTotal();" type="number" id="discount" placeholder="الخصم">
+                            <div class="total">المجموع: <span></span></div>
+                        </div>
+                        
+                        <input type="number" id="count" placeholder="الكمية">
+                        <input type="date" id="expiryDate" placeholder="تاريخ الانتهاء">
+                        
+                        
+                        <button id="create">إضافة دواء</button>
+                        <button id="importBtn" class="import-btn">استيراد من الداتا الخارجية</button>
+
+                        
+                        <div class="search-container">
+                            <input onkeyup="mainSearchData(this.value)" type="text" id="search" placeholder="بحث">
+                            <div class="btnSearch">
+                                <button id="searchName">بحث بالاسم</button>
+                                <button id="searchCompany">بحث بالشركة</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="delAll"></div>
+                    
+                    <div class="outputs">
+                        <div class="table-responsive">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>م</th>
+                                        <th>الدواء</th>
+                                        <th>الشركة</th>
+                                        <th>الصورة</th>
+                                        <th>السعر</th>
+                                        <th>الخصم</th>
+                                        <th>المجموع</th>
+                                        <th>الكمية</th>
+                                        <th>تاريخ الانتهاء</th>
+                                        <th>تعديل</th>
+                                        <th>حذف</th>
+                                        <th>بيع</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="sales-products-section">
+                <h2> عرض المنتجات</h2>
+                
+                <div class="category-filters-navbar" id="categoryFilters">
+                    <button class="filter-btn active" data-filter="All">الكل</button>
+                    <button class="filter-btn" data-filter="مضادات حيوية">مضادات حيوية</button>
+                    <button class="filter-btn" data-filter="مسكنات">مسكنات</button>
+                    <button class="filter-btn" data-filter="مستلزمات طبية">مستلزمات طبية</button>
+                    <button class="filter-btn" data-filter="أدوية مزمنة">أدوية مزمنة</button>
+                    <button class="filter-btn" data-filter="مكملات غذائية">مكملات غذائية</button>
+                    <button class="filter-btn" data-filter="مراهم">مراهم</button>
+                </div>
+                
+                <div class="search-bar product-search-bar">
+                    <input type="text" id="productSearch" placeholder="ابحث باسم المنتج أو الباركود هنا...">
+                    <button><i class="fas fa-search"></i></button>
+                </div>
+
+                <div class="products-grid-container" id="products-grid">
+                    <p class="loading-message">...جارِ تحميل المنتجات</p>
+                </div>
+            </div>
+            <div class="content-section" id="inventory-section">
+                <h2>إدارة المخزون</h2>
+                <div class="inventory-alerts">
+                    <div class="alert-card expired">
+                        <h3><i class="fas fa-exclamation-circle"></i> أدوية منتهية الصلاحية</h3>
+                        <div id="expired-list"></div>
+                    </div>
+                    <div class="alert-card low-stock">
+                        <h3><i class="fas fa-box"></i> أدوية منخفضة الكمية</h3>
+                        <div id="low-stock-list"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-section" id="sales-section">
+                <h2>نظام المبيعات</h2>
+
+                <div class="sales-summary">
+                    <div class="summary-card">
+                        <h3>مبيعات اليوم</h3>
+                        <p id="today-sales">0</p>
+                        <button id="clearTodaySalesBtn" class="sales-summary-delete">مسح</button>
+                    </div>
+                    <div class="summary-card">
+                        <h3>مبيعات الأسبوع</h3>
+                        <p id="week-sales">0</p>
+                        <button id="clearWeekSalesBtn" class="sales-summary-delete">مسح</button>
+                    </div>
+                    <div class="summary-card">
+                        <h3>مبيعات الشهر</h3>
+                        <p id="month-sales">0</p>
+                        <button id="clearMonthSalesBtn" class="sales-summary-delete">مسح</button>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="sales-table">
+                        <thead>
+                        <tr>
+                            <th>المنتج</th>
+                            <th>السعر</th>
+                            <th>الكمية</th>
+                            <th>الإجمالي</th>
+                            <th>الوقت</th>
+                        </tr>
+                        </thead>
+                        <tbody id="sales-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
