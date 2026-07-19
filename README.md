@@ -13,7 +13,7 @@ A modern, feature-rich **Pharmacy Management System** built with vanilla JavaScr
 
 ## 🌟 Live Demo
 
-> **Live Demo:** [View Live Project](https://pharmacy-management-sysytem.netlify.app/)  
+> **Live Demo:** [View Live Project](https://pharmacy-management-system-omega-red.vercel.app/)  
 
 
 ---
